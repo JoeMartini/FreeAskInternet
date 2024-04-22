@@ -3,54 +3,54 @@ services:
     image: docker.io/nashsu/free_ask_internet:latest
     depends_on:
       - llm-freegpt35
-    restart: on-failure
- 
+    ports:
+      - "40380:8000"
+    restart: unless-stopped
 
   freeaskinternet-ui:
     image: docker.io/nashsu/free_ask_internet_ui:latest
     ports:
-      - "3000:80"
+      - "40030:80"
     environment:
-      BACKEND_HOST: "backend:8000"
+      BACKEND_HOST: "backend:40380"
     depends_on:
       - backend
-    restart: always
+    restart: unless-stopped
 
   chatgpt-next-web:
     image: yidadaa/chatgpt-next-web
     ports:
-      - "3030:3000"
+      - "40330:3000"
     environment:
       OPENAI_API_KEY: "FreeAskInternet"
-      # CODE: "FreeAskInternet" # 如果你想要设置页面的访问密码，请修改这里
-      BASE_URL: "http://backend:8000"
+      CODE: "martini" # 如果你想要设置页面的访问密码，请修改这里
+      BASE_URL: "http://backend:40380"
       CUSTOM_MODELS: "-all,+gpt-3.5-turbo"
     depends_on:
       - llm-freegpt35
-    restart: always
+    restart: unless-stopped
 
   llm-freegpt35:
     image: missuo/freegpt35:latest
-    restart: always
+    restart: unless-stopped
 
   llm-kimi:
     image: vinlic/kimi-free-api:latest
-    restart: always
     environment:
       - TZ=Asia/Shanghai
+    restart: unless-stopped
 
   llm-glm4:
     image: vinlic/glm-free-api:latest
-    restart: always
     environment:
       - TZ=Asia/Shanghai
-
+    restart: unless-stopped
 
   llm-qwen:
     image: vinlic/qwen-free-api:latest
-    restart: always
     environment:
       - TZ=Asia/Shanghai
+    restart: unless-stopped
 
   searxng:
     image: docker.io/searxng/searxng:latest
@@ -69,4 +69,4 @@ services:
       options:
         max-size: '1m'
         max-file: '1'
-    restart: always
+    restart: unless-stopped
